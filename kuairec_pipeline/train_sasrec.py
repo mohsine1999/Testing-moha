@@ -8,6 +8,17 @@ import logging
 from pathlib import Path
 from typing import Dict, Optional, Sequence
 
+import numpy as np
+
+# RecBole's quick-start module pulls in Ray Tune, whose logger expects the alias
+# ``np.bool8`` that only exists in newer NumPy releases. Some Python environments
+# (including the one reported by users) ship an older NumPy where this alias is
+# missing, causing an ``AttributeError`` during import. We provide the alias
+# manually when absent so the training entry-point works regardless of the NumPy
+# version that happens to be installed.
+if not hasattr(np, "bool8"):
+    np.bool8 = np.bool_  # type: ignore[attr-defined]
+
 try:
     from recbole.quick_start import run_recbole
 except ImportError as import_error:  # pragma: no cover - raised only if RecBole missing.
