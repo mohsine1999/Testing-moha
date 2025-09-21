@@ -85,6 +85,31 @@ def train_model(
         # caller explicitly supplies a different setting via ``extra_config``.
         "train_neg_sample_args": None,
     }
+
+    dataset_lower = dataset.lower()
+    auto_memory_guard = any(token in dataset_lower for token in ("big", "full"))
+    if auto_memory_guard:
+        # Training on the full KuaiRec interaction log requires substantially
+        # more host memory than the default quick-start hyperparameters demand.
+        # We proactively dial down the most memory-hungry knobs when we detect a
+        # "big" dataset name so the run has a better chance of finishing on
+        # commodity laptops. Users can still override these choices explicitly
+        # via the CLI/``extra_config`` if they have access to more resources.
+        if train_batch_size is None:
+            overrides["train_batch_size"] = 256
+        if eval_batch_size is None:
+            overrides["eval_batch_size"] = 512
+        if max_seq_length is None:
+            overrides["MAX_ITEM_LIST_LENGTH"] = 100
+        logging.info(
+            "Dataset '%s' detected as large; applying memory-friendly defaults %s",
+            dataset,
+            {
+                "train_batch_size": overrides.get("train_batch_size"),
+                "eval_batch_size": overrides.get("eval_batch_size"),
+                "MAX_ITEM_LIST_LENGTH": overrides.get("MAX_ITEM_LIST_LENGTH"),
+            },
+        )
     if checkpoint_dir is not None:
         overrides["checkpoint_dir"] = str(checkpoint_dir)
     if learning_rate is not None:

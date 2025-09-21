@@ -36,6 +36,26 @@ on the command line, e.g.:
 python -m kuairec_pipeline.train_sasrec --learning-rate 0.0005 --epochs 50
 ```
 
+### Running on the full KuaiRec logs
+
+The `big_matrix.csv` file contains 11M+ interactions and can exhaust the memory
+available on laptops when paired with large sequence lengths and batch sizes.
+Whenever the dataset name includes `big` or `full`, the training wrapper
+automatically switches to memory-friendlier defaults:
+
+- `train_batch_size = 256`
+- `eval_batch_size = 512`
+- `MAX_ITEM_LIST_LENGTH = 100`
+
+You can still provide explicit overrides if you have more resources available,
+for example:
+
+```bash
+python -m kuairec_pipeline.train_sasrec \
+    --dataset-name kuairec_big --train-batch-size 128 --eval-batch-size 256 \
+    --max-seq-length 80
+```
+
 ## 3. Python environment
 
 Install the Python dependencies in a virtual environment (Python ≥ 3.9):
