@@ -10,14 +10,37 @@ from typing import Dict, Optional, Sequence
 
 import numpy as np
 
+
+def _ensure_numpy_alias(name: str, target: object) -> None:
+    """Expose deprecated NumPy aliases expected by RecBole/Ray.
+
+    NumPy 2.0 removed a collection of legacy attribute names (``np.float_``,
+    ``np.complex_``, ``np.unicode_``, ``np.bool8`` …) that downstream packages
+    such as RecBole and Ray Tune still access at import time. When those
+    attributes are missing, importing the training entry point immediately fails
+    before any of our code runs. We defensively recreate the aliases the first
+    time this module is imported so the rest of the pipeline remains usable
+    regardless of the NumPy major version installed by the user.
+    """
+
+    if not hasattr(np, name):
+        setattr(np, name, target)
+
+
 # RecBole's quick-start module pulls in Ray Tune, whose logger expects the alias
 # ``np.bool8`` that only exists in newer NumPy releases. Some Python environments
 # (including the one reported by users) ship an older NumPy where this alias is
 # missing, causing an ``AttributeError`` during import. We provide the alias
 # manually when absent so the training entry-point works regardless of the NumPy
 # version that happens to be installed.
-if not hasattr(np, "bool8"):
-    np.bool8 = np.bool_  # type: ignore[attr-defined]
+_ensure_numpy_alias("bool8", np.bool_)
+
+# RecBole also references the NumPy 1.x scalar aliases that vanished in NumPy
+# 2.0 when applying its internal backward-compatibility shim. Expose them so
+# their assignments succeed instead of raising ``AttributeError``.
+_ensure_numpy_alias("float_", np.float64)
+_ensure_numpy_alias("complex_", np.complex128)
+_ensure_numpy_alias("unicode_", np.str_)
 
 try:
     from recbole.quick_start import run_recbole
