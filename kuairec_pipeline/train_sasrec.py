@@ -67,7 +67,6 @@ def train_model(
     seed: Optional[int] = None,
     device: Optional[str] = None,
     max_seq_length: Optional[int] = None,
-    neg_samples: Optional[int] = None,
     extra_config: Optional[Dict[str, object]] = None,
 ) -> Dict[str, object]:
     """Launch a RecBole training run and return its reported metrics."""
@@ -97,8 +96,6 @@ def train_model(
         overrides["device"] = device
     if max_seq_length is not None:
         overrides["MAX_ITEM_LIST_LENGTH"] = max_seq_length
-    if neg_samples is not None:
-        overrides["neg_sampling"] = {"uniform": neg_samples}
     if extra_config:
         overrides.update(extra_config)
 
@@ -166,12 +163,6 @@ def _parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
         help="Override MAX_ITEM_LIST_LENGTH for SASRec.",
     )
     parser.add_argument(
-        "--neg-samples",
-        type=int,
-        default=None,
-        help="Number of negative samples per positive instance.",
-    )
-    parser.add_argument(
         "--log-level",
         default="INFO",
         help="Python logging level (default: INFO).",
@@ -200,7 +191,6 @@ def main(argv: Optional[Sequence[str]] = None) -> Dict[str, object]:
         seed=args.seed,
         device=args.device,
         max_seq_length=args.max_seq_length,
-        neg_samples=args.neg_samples,
     )
     return result
 

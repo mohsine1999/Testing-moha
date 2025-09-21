@@ -33,7 +33,7 @@ The command uses the baseline hyperparameters defined in
 on the command line, e.g.:
 
 ```bash
-python -m kuairec_pipeline.train_sasrec --learning-rate 0.0005 --neg-samples 5
+python -m kuairec_pipeline.train_sasrec --learning-rate 0.0005 --epochs 50
 ```
 
 ## 3. Python environment
