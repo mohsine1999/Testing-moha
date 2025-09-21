@@ -1,0 +1,59 @@
+# Baseline configuration for training RecBole's SASRec on KuaiRec interactions.
+field_separator: "\t"
+model: SASRec
+dataset: kuairec_small
+data_path: data
+USER_ID_FIELD: user_id
+ITEM_ID_FIELD: item_id
+TIME_FIELD: timestamp
+load_col:
+  inter: [user_id, item_id, timestamp, label, watch_ratio, play_duration, video_duration]
+# Uncomment the following when side information files are generated.
+#  user: [user_id, user_active_degree, is_lowactive_period, is_live_streamer, is_video_author,
+#         follow_user_num, fans_user_num, friend_user_num, register_days, follow_user_num_range,
+#         fans_user_num_range, friend_user_num_range, register_days_range,
+#         onehot_feat0, onehot_feat1, onehot_feat2, onehot_feat3, onehot_feat4, onehot_feat5,
+#         onehot_feat6, onehot_feat7, onehot_feat8, onehot_feat9, onehot_feat10, onehot_feat11,
+#         onehot_feat12, onehot_feat13, onehot_feat14, onehot_feat15, onehot_feat16, onehot_feat17]
+#  item: [item_id, author_id, video_type, upload_type, video_duration, video_width, video_height,
+#         music_id, video_tag_id, show_cnt, show_user_num, play_cnt, play_user_num, play_duration,
+#         complete_play_cnt, valid_play_cnt, long_time_play_cnt, short_time_play_cnt,
+#         play_progress, like_cnt, comment_cnt, follow_cnt, share_cnt, download_cnt, tags]
+
+# Sequential recommendation evaluation protocol.
+eval_args:
+  split: {"RS": [0.8, 0.1, 0.1]}
+  group_by: user
+  order: TO
+  mode: full
+
+metrics: [Recall, NDCG, MRR]
+topk: [5, 10, 20]
+valid_metric: Recall@10
+metric_decimal_place: 4
+
+# Training hyper-parameters.
+epochs: 100
+learning_rate: 0.001
+train_batch_size: 2048
+eval_batch_size: 4096
+neg_sampling:
+  uniform: 1
+
+# SASRec architecture.
+MAX_ITEM_LIST_LENGTH: 200
+hidden_size: 128
+inner_size: 256
+n_layers: 2
+n_heads: 2
+hidden_dropout_prob: 0.2
+attn_dropout_prob: 0.2
+initializer_range: 0.02
+loss_type: CE
+
+# Reproducibility & logging.
+seed: 2020
+reproducibility: true
+device: cpu
+log_wandb: false
+checkpoint_dir: saved
