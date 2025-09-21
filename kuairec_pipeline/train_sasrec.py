@@ -79,6 +79,11 @@ def train_model(
     overrides: Dict[str, object] = {
         "data_path": str(data_path),
         "dataset": dataset,
+        # RecBole's SASRec defaults to one negative sample per positive pair when
+        # ``loss_type`` is ``CE``. That combination is invalid in recent
+        # RecBole versions, so we always disable negative sampling unless a
+        # caller explicitly supplies a different setting via ``extra_config``.
+        "train_neg_sample_args": None,
     }
     if checkpoint_dir is not None:
         overrides["checkpoint_dir"] = str(checkpoint_dir)
