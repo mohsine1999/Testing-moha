@@ -87,6 +87,13 @@ def train_model(
         overrides["MAX_ITEM_LIST_LENGTH"] = max_seq_length
     if neg_samples is not None:
         overrides["neg_sampling"] = {"uniform": neg_samples}
+        # RecBole expects the BCE loss when negative sampling is enabled.
+        if overrides.get("loss_type") not in {"BCE", "BPR"}:
+            logging.info(
+                "Switching loss_type to BCE to support %s uniform negative samples",
+                neg_samples,
+            )
+            overrides["loss_type"] = "BCE"
     if extra_config:
         overrides.update(extra_config)
 
