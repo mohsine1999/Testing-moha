@@ -78,6 +78,7 @@ epochs: 120
 learning_rate: 0.0005
 train_batch_size: 1024
 eval_batch_size: 4096
+train_neg_sample_args: null
 
 # FDSA architecture.
 MAX_ITEM_LIST_LENGTH: 200
