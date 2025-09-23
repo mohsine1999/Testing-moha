@@ -11,11 +11,27 @@ from typing import Dict, Optional
 try:  # pragma: no cover - exercised only when RecBole is missing.
     import numpy as np
 
-    if not hasattr(np, "bool8"):
-        # NumPy<1.24 exposes bool8 as bool_, whereas newer Ray builds expect the
-        # alias to exist. Providing it here avoids import-time crashes in
-        # recbole.quick_start even when hyperparameter tuning is unused.
-        np.bool8 = np.bool_
+    _NUMPY_COMPAT_ALIASES = {
+        # NumPy<1.24 exposes bool8 as bool_, whereas newer Ray builds expect
+        # the alias to exist. NumPy>=2 removed a couple of other dtype aliases
+        # (``float_``, ``complex_``, ``unicode_``) that the RecBole compatibility
+        # shim still references. We restore them here so older RecBole releases
+        # keep working across NumPy versions.
+        "bool8": ("bool_", bool),
+        "float_": ("float64", float),
+        "complex_": ("complex128", complex),
+        "unicode_": ("str_", str),
+    }
+    for alias, candidates in _NUMPY_COMPAT_ALIASES.items():
+        if hasattr(np, alias):
+            continue
+        if not isinstance(candidates, tuple):
+            candidates = (candidates,)
+        for candidate in candidates:
+            target = getattr(np, candidate, None) if isinstance(candidate, str) else candidate
+            if target is not None:
+                setattr(np, alias, target)
+                break
 
     from recbole.quick_start import run_recbole
 except ImportError as import_error:  # pragma: no cover - raised only if RecBole missing.
