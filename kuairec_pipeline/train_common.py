@@ -9,6 +9,14 @@ from pathlib import Path
 from typing import Dict, Optional
 
 try:  # pragma: no cover - exercised only when RecBole is missing.
+    import numpy as np
+
+    if not hasattr(np, "bool8"):
+        # NumPy<1.24 exposes bool8 as bool_, whereas newer Ray builds expect the
+        # alias to exist. Providing it here avoids import-time crashes in
+        # recbole.quick_start even when hyperparameter tuning is unused.
+        np.bool8 = np.bool_
+
     from recbole.quick_start import run_recbole
 except ImportError as import_error:  # pragma: no cover - raised only if RecBole missing.
     run_recbole = None  # type: ignore[assignment]
