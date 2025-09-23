@@ -59,6 +59,25 @@ selected_features:
   - share_cnt
   - download_cnt
   - tags
+numerical_features:
+  - video_duration
+  - video_width
+  - video_height
+  - show_cnt
+  - show_user_num
+  - play_cnt
+  - play_user_num
+  - play_duration
+  - complete_play_cnt
+  - valid_play_cnt
+  - long_time_play_cnt
+  - short_time_play_cnt
+  - play_progress
+  - like_cnt
+  - comment_cnt
+  - follow_cnt
+  - share_cnt
+  - download_cnt
 pooling_mode: 'mean'
 
 # Sequential recommendation evaluation protocol.
