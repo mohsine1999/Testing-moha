@@ -7,7 +7,7 @@ USER_ID_FIELD: user_id
 ITEM_ID_FIELD: item_id
 TIME_FIELD: timestamp
 load_col:
-  inter: [user_id, item_id, timestamp, label, watch_ratio, play_duration, video_duration]
+  inter: [user_id, item_id, timestamp, label]
   item:
     - item_id
     - author_id
